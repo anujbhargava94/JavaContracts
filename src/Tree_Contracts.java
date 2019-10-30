@@ -145,8 +145,7 @@ class AbsTree {
 	}
 
 	boolean member(int n) {
-		return (value == n)
-				|| (_____________________________________________ && _____________________________________________);
+		return (value == n) || ((left != null && left.member(n)) || (right != null && right.member(n)));
 	}
 
 	public AbsTree_Iterator iterator() {
@@ -156,7 +155,7 @@ class AbsTree {
 	// The pre-condition should apply to trees and duptrees and should ensure
 	// that the last value cannot be deleted from a tree or duptree
 
-	@Requires("______________________________________________________")
+	@Requires("get_count() !=1 || value!=n || left!=null || right!=null")
 
 	public boolean delete(int n) {
 
@@ -247,7 +246,7 @@ class AbsTree {
 	}
 
 	// @Requires("true")
-	@Ensures("____________________________________")
+	@Ensures("result!= null &&  result.value == n")
 	protected AbsTree find(int n) {
 		if (value == n)
 			return this;
@@ -325,7 +324,7 @@ class Tree extends AbsTree {
 
 	// state the post-condition for Tree.delete
 	// (the pre-condition is from AbsTree.delete)
-	@Ensures("_________________________________")
+	@Ensures("find(n) == null")
 	public boolean delete(int n) {
 		return super.delete(n);
 	}
@@ -359,22 +358,34 @@ class DupTree extends AbsTree {
 	// state the post-condition for DupTree.insert
 	// (the pre-condition is "true")
 
-	@Ensures("____________________________________________")
+	@Ensures("n_count == old_n_count+1")
 	public boolean insert(int n) {
 
 		// Invoke super.insert(n) to perform insertion
-		// into duptree. Write extra code to facilitae
+		// into duptree. Write extra code to facilitate
 		// the statement of the post-condition.
+		boolean isInserted = super.insert(n);
+		old_n_count = count;
+		if (isInserted) {
+			n_count = old_n_count + 1;
+		}
+		return isInserted;
 	}
 
 	// state the pre-condition for DupTree.delete
 	// (the pre-condition is from AbsTree.delete)
-	@Ensures("__________________________________________")
+	@Ensures("n_count == old_n_count-1")
 	public boolean delete(int n) {
 
 		// Invoke super.delete(n) to delete n from duptree.
 		// Write extra code to facilitate the statement
 		// of the post-condition.
+		boolean isDeleted = super.delete(n);
+		old_n_count = count;
+		if (isDeleted) {
+			n_count = old_n_count - 1;
+		}
+		return isDeleted;
 	}
 
 	protected AbsTree add_node(int n) {
@@ -418,8 +429,8 @@ class DupTree extends AbsTree {
 
 class AbsTree_Iterator {
 
-	@Requires("______________________________")
-	@Ensures("_______________________________")
+	@Requires("root.ordered()")
+	@Ensures("stack.peek().value ==  root.min().value")
 	public AbsTree_Iterator(AbsTree root) {
 		stack_left_spine(root);
 	}
@@ -428,8 +439,8 @@ class AbsTree_Iterator {
 		return !stack.isEmpty() || count > 0;
 	}
 
-	@Requires("_____________________")
-	@Ensures({ "_____________________" })
+	@Requires("!stack.isEmpty() || count > 0")
+	@Ensures({ "stack.isEmpty() || result<stack.peek().value" })
 	public int next() {
 		if (count == 0) {
 			AbsTree node = stack.pop();
@@ -442,7 +453,7 @@ class AbsTree_Iterator {
 	}
 
 	@Requires("true")
-	@Ensures({ "______________________________________" })
+	@Ensures({ "node==null || (node.min().value == stack.peek().value)" })
 	private void stack_left_spine(AbsTree node) {
 		if (node == null)
 			return;
