@@ -246,7 +246,7 @@ class AbsTree {
 	}
 
 	// @Requires("true")
-	@Ensures("result!= null &&  result.value == n")
+	@Ensures("result == null || (result!= null &&  result.value == n)")
 	protected AbsTree find(int n) {
 		if (value == n)
 			return this;
@@ -430,7 +430,7 @@ class DupTree extends AbsTree {
 class AbsTree_Iterator {
 
 	@Requires("root.ordered()")
-	@Ensures("stack.peek().value ==  root.min().value")
+	@Ensures("stack.peek().value ==  old(root).min().value")
 	public AbsTree_Iterator(AbsTree root) {
 		stack_left_spine(root);
 	}
@@ -453,7 +453,7 @@ class AbsTree_Iterator {
 	}
 
 	@Requires("true")
-	@Ensures({ "node==null || (node.min().value == stack.peek().value)" })
+	@Ensures({ "old(node)==null || (old(node).min().value == stack.peek().value)" })
 	private void stack_left_spine(AbsTree node) {
 		if (node == null)
 			return;
