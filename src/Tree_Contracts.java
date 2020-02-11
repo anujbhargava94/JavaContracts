@@ -453,7 +453,7 @@ class AbsTree_Iterator {
 	}
 
 	@Requires("true")
-	@Ensures({ "old(node)==null || (old(node).min().value == stack.peek().value)" })
+	@Ensures({ "node==null || (old(node).min().value == stack.peek().value)" })
 	private void stack_left_spine(AbsTree node) {
 		if (node == null)
 			return;
